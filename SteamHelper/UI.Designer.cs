@@ -28,35 +28,37 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.MsgBtn = new System.Windows.Forms.Label();
+            this.InstructionLabel = new System.Windows.Forms.Label();
             this.UsernameBox = new System.Windows.Forms.TextBox();
             this.PasswordBox = new System.Windows.Forms.TextBox();
             this.Usr = new System.Windows.Forms.Label();
             this.Pswd = new System.Windows.Forms.Label();
             this.LogonButton = new System.Windows.Forms.Button();
+            this.MessageLabel = new System.Windows.Forms.Label();
+            this.LogoffButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // MsgBtn
+            // InstructionLabel
             // 
-            this.MsgBtn.AutoSize = true;
-            this.MsgBtn.Location = new System.Drawing.Point(622, 286);
-            this.MsgBtn.Name = "MsgBtn";
-            this.MsgBtn.Size = new System.Drawing.Size(491, 32);
-            this.MsgBtn.TabIndex = 0;
-            this.MsgBtn.Text = "Please enter username and password";
+            this.InstructionLabel.AutoSize = true;
+            this.InstructionLabel.Location = new System.Drawing.Point(622, 286);
+            this.InstructionLabel.Name = "InstructionLabel";
+            this.InstructionLabel.Size = new System.Drawing.Size(491, 32);
+            this.InstructionLabel.TabIndex = 0;
+            this.InstructionLabel.Text = "Please enter username and password";
             // 
             // UsernameBox
             // 
             this.UsernameBox.Location = new System.Drawing.Point(778, 392);
             this.UsernameBox.Name = "UsernameBox";
-            this.UsernameBox.Size = new System.Drawing.Size(100, 38);
+            this.UsernameBox.Size = new System.Drawing.Size(381, 38);
             this.UsernameBox.TabIndex = 1;
             // 
             // PasswordBox
             // 
-            this.PasswordBox.Location = new System.Drawing.Point(773, 467);
+            this.PasswordBox.Location = new System.Drawing.Point(778, 458);
             this.PasswordBox.Name = "PasswordBox";
-            this.PasswordBox.Size = new System.Drawing.Size(100, 38);
+            this.PasswordBox.Size = new System.Drawing.Size(381, 38);
             this.PasswordBox.TabIndex = 2;
             // 
             // Usr
@@ -81,7 +83,7 @@
             // 
             // LogonButton
             // 
-            this.LogonButton.Location = new System.Drawing.Point(710, 630);
+            this.LogonButton.Location = new System.Drawing.Point(692, 695);
             this.LogonButton.Name = "LogonButton";
             this.LogonButton.Size = new System.Drawing.Size(249, 79);
             this.LogonButton.TabIndex = 5;
@@ -89,17 +91,38 @@
             this.LogonButton.UseVisualStyleBackColor = true;
             this.LogonButton.Click += new System.EventHandler(this.LogonButton_Click);
             // 
+            // MessageLabel
+            // 
+            this.MessageLabel.AutoSize = true;
+            this.MessageLabel.Location = new System.Drawing.Point(796, 624);
+            this.MessageLabel.Name = "MessageLabel";
+            this.MessageLabel.Size = new System.Drawing.Size(0, 32);
+            this.MessageLabel.TabIndex = 6;
+            this.MessageLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // LogoffButton
+            // 
+            this.LogoffButton.Location = new System.Drawing.Point(1161, 695);
+            this.LogoffButton.Name = "LogoffButton";
+            this.LogoffButton.Size = new System.Drawing.Size(230, 79);
+            this.LogoffButton.TabIndex = 7;
+            this.LogoffButton.Text = "Log off";
+            this.LogoffButton.UseVisualStyleBackColor = true;
+            this.LogoffButton.Click += new System.EventHandler(this.LogoffButton_Click);
+            // 
             // UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1851, 979);
+            this.Controls.Add(this.LogoffButton);
+            this.Controls.Add(this.MessageLabel);
             this.Controls.Add(this.LogonButton);
             this.Controls.Add(this.Pswd);
             this.Controls.Add(this.Usr);
             this.Controls.Add(this.PasswordBox);
             this.Controls.Add(this.UsernameBox);
-            this.Controls.Add(this.MsgBtn);
+            this.Controls.Add(this.InstructionLabel);
             this.Name = "UI";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.UI_Load);
@@ -110,12 +133,14 @@
 
         #endregion
 
-        private System.Windows.Forms.Label MsgBtn;
+        private System.Windows.Forms.Label InstructionLabel;
         private System.Windows.Forms.TextBox UsernameBox;
         private System.Windows.Forms.TextBox PasswordBox;
         private System.Windows.Forms.Label Usr;
         private System.Windows.Forms.Label Pswd;
         private System.Windows.Forms.Button LogonButton;
+        private System.Windows.Forms.Label MessageLabel;
+        private System.Windows.Forms.Button LogoffButton;
     }
 }
 
