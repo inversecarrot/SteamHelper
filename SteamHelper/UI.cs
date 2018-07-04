@@ -17,12 +17,15 @@ namespace SteamHelper
         delegate void StringArgReturningVoidDelegate(string text);
         delegate void VoidDelegate();
         private static LogonManager man;
-        private ConcurrentQueue<string> senderLM;
-        private ConcurrentQueue<string> recieverLM;
+        private ConcurrentQueue<object> senderLM;
+        private ConcurrentQueue<object> recieverLM;
+        private bool twofa = false;
+        private bool auth = false;
+        private bool timeToClose = false;
         public UI(LogonManager manager)
         {
             InitializeComponent();
-            this.FormClosing += UI_FormClosing;
+            FormClosing += UI_FormClosing;
             man = manager;
         }
 
@@ -40,16 +43,26 @@ namespace SteamHelper
         {
             man.SetUsername(UsernameBox.Text);
             man.SetPassword(PasswordBox.Text);
+            if (twofa)
+            {
+                man.SetGuardCode(TwoFABox.Text, true);
+            }
+            if (auth)
+            {
+                man.SetGuardCode(TwoFABox.Text, false);
+            }
         }
 
         private void UI_FormClosing(object sender, FormClosingEventArgs e)
         {
+            ManualResetEvent closeEvent = new ManualResetEvent(false);
+            senderLM.Enqueue(closeEvent);
+            senderLM.Enqueue("close");
             if (man.LoggedOn)
             {
                 man.Logoff();
             }
-            senderLM.Enqueue("close");
-            Console.WriteLine("sent close");
+            closeEvent.WaitOne();
             ThreadManager.Close();
         }
 
@@ -71,15 +84,62 @@ namespace SteamHelper
             }
         }
 
+        public void RecieveMessage()
+        {
+            VoidDelegate d = new VoidDelegate(RecieveMessageInternal);
+            Invoke(d);
+        }
+
+        private void RecieveMessageInternal()
+        {
+            object message = null;
+            recieverLM.TryDequeue(out message);
+            switch (message)
+            {
+                case string strmessage:
+                    switch (strmessage)
+                    {
+                        case "2fa":
+                            make2fa();
+                            twofa = true;
+                            return;
+                        case "auth":
+                            makeAuth();
+                            auth = true;
+                            return;
+                        default:
+                            throw new InvalidMessageException(message);
+                    }
+                default:
+                    throw new InvalidMessageException(message);            
+            }
+        }
+
+        private void make2fa()
+        {
+            TwoFABox.Visible = true;
+            TwoFAText.Text = "2FA code";
+            TwoFAText.Visible = true;
+        }
+
+        private void makeAuth()
+        {
+            TwoFABox.Visible = true;
+            TwoFAText.Text = "Auth code";
+            TwoFAText.Visible = true;
+        }
+
         private void LogoffButton_Click(object sender, EventArgs e)
         {
             man.Logoff();
+            TwoFABox.Visible = false;
+            TwoFAText.Visible = false;
         }
 
-        public void loadMessagePipelineLM(ConcurrentQueue<string> sender, ConcurrentQueue<string> reciever)
+        public void loadMessagePipelineLM(ConcurrentQueue<object> sender, ConcurrentQueue<object> reciever)
         {
-            this.senderLM = sender;
-            this.recieverLM = reciever;
+            senderLM = sender;
+            recieverLM = reciever;
         }
     }
 }

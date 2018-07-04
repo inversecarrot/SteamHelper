@@ -19,8 +19,8 @@ namespace SteamHelper
         [STAThread]
         static void Main()
         {
-            ConcurrentQueue<string> q1 = new ConcurrentQueue<string>();
-            ConcurrentQueue<string> q2 = new ConcurrentQueue<string>();
+            ConcurrentQueue<object> q1 = new ConcurrentQueue<object>();
+            ConcurrentQueue<object> q2 = new ConcurrentQueue<object>();
             manager = new LogonManager();
             logonm = new Thread(manager.Run);
             Application.SetCompatibleTextRenderingDefault(false);
@@ -39,7 +39,8 @@ namespace SteamHelper
             
         }
 
-        // Step 1: Log on
+        // DONE Step 1: Log on 
+        // Step 1a: Switch UI
         // Step 2: Fetch user data, load/store game data from steam
         // Step 3: Display list of games
         // Step 4a: Display data about games (start with data directly available from Steam)

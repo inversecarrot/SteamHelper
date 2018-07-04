@@ -13,11 +13,12 @@ namespace SteamHelper
 {
     public class LogonManager
     {
-        private ConcurrentQueue<string> senderUI;
-        private ConcurrentQueue<string> recieverUI;
+        private ConcurrentQueue<object> senderUI;
+        private ConcurrentQueue<object> recieverUI;
         private static bool RUN_FLAG = true;
         bool attemptedToConnect = false;
         bool twofaReconnect = false;
+        private ManualResetEvent doneClose = null;
 
         public bool LoggedOn
         {
@@ -69,32 +70,31 @@ namespace SteamHelper
                 }
                 if (!recieverUI.IsEmpty)
                 {
-                    string message = "";
+                    object message = null;
                     recieverUI.TryDequeue(out message);
-                    if (!message.Equals(""))
-                    {
-                        ProcessMessage(message);
-                    }                    
+                    ProcessMessage(message);      
                 }
             }
+            doneClose.Set();
         }
 
-        private void ProcessMessage(string message)
+        private void ProcessMessage(object message)
         {
-            Console.WriteLine("Recieved message {0}", message);
-            switch (message)
-            {
-                case "close":
-                    RUN_FLAG = false;
+            switch (message) {
+                case string strmessage:
+                    switch (strmessage)
+                    {
+                        case "close":
+                            RUN_FLAG = false;
+                            return;
+                        default:
+                            throw new InvalidMessageException(strmessage);
+                    }
+                case ManualResetEvent manreset:
+                    doneClose = manreset;
                     return;
                 default:
                     throw new InvalidMessageException(message);
-            }
-        }
-        private class InvalidMessageException : Exception
-        {
-            public InvalidMessageException(string message) : base(message)
-            {
             }
         }
 
@@ -182,20 +182,16 @@ namespace SteamHelper
         // Run when disconnected from steam service and given the disconnected callback
         private void OnDisconnected(SteamClient.DisconnectedCallback callback)
         {            
-            if (twofaReconnect)
+            if (!twofaReconnect)
             {
-                UpdateUILabel("Disconnected from steam, reconnecting...");
-                Thread.Sleep(TimeSpan.FromSeconds(5));
-                steamClient.Connect();
+                UpdateUILabel("Logged off and disconnected");                
             }
-            else
-            {
-                UpdateUILabel("Logged off and disconnected");
-                user = null;
-                pass = null;
-                loggedOn = false;
-                attemptedToConnect = false;
-            }
+            user = null;
+            pass = null;
+            twoFactorAuth = null;
+            authCode = null;
+            loggedOn = false;
+            attemptedToConnect = false;
         }
 
         // Run when given logged on callback
@@ -209,15 +205,18 @@ namespace SteamHelper
             if (isSteamGuard || is2FA)
             {
                 twofaReconnect = true;
-                UpdateUILabel("This account is SteamGuard protected!");
 
                 if (is2FA)
                 {
+                    senderUI.Enqueue("2fa");
                     UpdateUILabel("Please enter your 2 factor auth code from your authenticator app ");
+                    ui.RecieveMessage();
                 }
                 else
                 {
+                    senderUI.Enqueue("auth");
                     UpdateUILabel("Please enter the auth code sent to the email at " + callback.EmailDomain);
+                    ui.RecieveMessage();
                 }
             }
             else if (callback.Result != EResult.OK)
@@ -230,6 +229,7 @@ namespace SteamHelper
             else
             {
                 UpdateUILabel("Successfully logged on");
+                twofaReconnect = false;
                 loggedOn = true;
             }            
         }
@@ -241,6 +241,8 @@ namespace SteamHelper
             UpdateUILabel("System logged off");
             user = null;
             pass = null;
+            twoFactorAuth = null;
+            authCode = null;
             loggedOn = false;
             attemptedToConnect = false;
         }        
@@ -274,15 +276,17 @@ namespace SteamHelper
             }
             return false;
         }
-        // Sets AuthCode if not currently set, returns whether successful
-        public bool SetAuthCode(string newAuthCode)
+       
+        public void SetGuardCode(string newGuardCode, bool is2fa)
         {
-            if (authCode == null)
+            if (is2fa)
             {
-                authCode = newAuthCode;
-                return true;
+                twoFactorAuth = newGuardCode;
             }
-            return false;
+            else
+            {
+                authCode = newGuardCode;
+            }
         }
 
         public bool SetTwoFactorAuth(string TwoFactorAuthCode)
@@ -300,7 +304,7 @@ namespace SteamHelper
         {
             this.ui = ui;
         }
-        public void loadMessagePipelineUI(ConcurrentQueue<string> sender, ConcurrentQueue<string> reciever)
+        public void loadMessagePipelineUI(ConcurrentQueue<object> sender, ConcurrentQueue<object> reciever)
         {
             this.senderUI = sender;
             this.recieverUI = reciever;

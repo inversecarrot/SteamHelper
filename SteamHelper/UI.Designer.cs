@@ -36,6 +36,8 @@
             this.LogonButton = new System.Windows.Forms.Button();
             this.MessageLabel = new System.Windows.Forms.Label();
             this.LogoffButton = new System.Windows.Forms.Button();
+            this.TwoFABox = new System.Windows.Forms.TextBox();
+            this.TwoFAText = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // InstructionLabel
@@ -110,11 +112,31 @@
             this.LogoffButton.UseVisualStyleBackColor = true;
             this.LogoffButton.Click += new System.EventHandler(this.LogoffButton_Click);
             // 
+            // TwoFABox
+            // 
+            this.TwoFABox.Location = new System.Drawing.Point(778, 519);
+            this.TwoFABox.Name = "TwoFABox";
+            this.TwoFABox.Size = new System.Drawing.Size(381, 38);
+            this.TwoFABox.TabIndex = 8;
+            this.TwoFABox.Visible = false;
+            // 
+            // TwoFAText
+            // 
+            this.TwoFAText.AutoSize = true;
+            this.TwoFAText.Location = new System.Drawing.Point(525, 525);
+            this.TwoFAText.Name = "TwoFAText";
+            this.TwoFAText.Size = new System.Drawing.Size(66, 32);
+            this.TwoFAText.TabIndex = 9;
+            this.TwoFAText.Text = "2fA:";
+            this.TwoFAText.Visible = false;
+            // 
             // UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1851, 979);
+            this.Controls.Add(this.TwoFAText);
+            this.Controls.Add(this.TwoFABox);
             this.Controls.Add(this.LogoffButton);
             this.Controls.Add(this.MessageLabel);
             this.Controls.Add(this.LogonButton);
@@ -141,6 +163,8 @@
         private System.Windows.Forms.Button LogonButton;
         private System.Windows.Forms.Label MessageLabel;
         private System.Windows.Forms.Button LogoffButton;
+        private System.Windows.Forms.TextBox TwoFABox;
+        private System.Windows.Forms.Label TwoFAText;
     }
 }
 
